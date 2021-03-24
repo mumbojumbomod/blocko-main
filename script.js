@@ -18,7 +18,7 @@ class preScene extends Phaser.Scene {
   create() {
     this.createAnimations();
     this.add.text(20, 150, 'Endless Shadows', { fontSize: '50px', fill: '#ff00fb' });
-    this.add.text(150, 200, 'By Elias', { fontSize: '30px', fill: '#ff00fb' });
+    this.add.text(150, 200, 'By Talus', { fontSize: '30px', fill: '#ff00fb' });
     this.add.text(60, 250, 'Can you defeat the darkness?', { fontSize: '20px', fill: '#ff00fb' });
     this.add.text(160, 300, 'Click to start.', { fontSize: '15px', fill: '#ff00fb' });
     gameState.circle = this.add.sprite(230, 350, 'circle').setScale()//20, 100
@@ -341,9 +341,6 @@ class Level extends Phaser.Scene {
   }
 
   update() {
-    gameState.shadow.children.iterate(function (child) {
-      //gameState.pain(child.x, child.y)
-    });
 
     if (gameState.active) {
       if (gameState.cursors.right.isDown) {
