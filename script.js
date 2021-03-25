@@ -76,7 +76,6 @@ class win extends Phaser.Scene {
   update() {
   }
 }
-
 class Level extends Phaser.Scene {
 
   constructor(key) {
@@ -108,7 +107,6 @@ class Level extends Phaser.Scene {
     // Load the export Tiled JSON
     this.load.tilemapTiledJSON('map', 'shadow1.json');
   }
-
   create() {
     this.createParallaxBackgrounds();
     gameState.jump = this.sound.add('jump');
@@ -118,8 +116,7 @@ class Level extends Phaser.Scene {
     this.lights.enable()//.setAmbientColor(0xffffff);
     gameState.active = true
     gameState.player = this.physics.add.sprite(gameState.spawnPointX, gameState.spawnPointY, 'codey').setScale(.5)//20, 100
-    gameState.spawnPointX = 20;
-    gameState.spawnPointY = 100;
+
     gameState.player.anims.play('run', false);
     gameState.player.body.setSize(gameState.player.width - 40, gameState.player.height - 50).setOffset(20, 50);
     gameState.player.setBounce(.2)
@@ -163,6 +160,9 @@ class Level extends Phaser.Scene {
             if (progress > .9) {
               this.scene.stop('Level')
               this.scene.start('dead')
+            } else if (progress >= 1) {
+              gameState.player.x = gameState.spawnPointX
+              gameState.player.y = gameState.spawnPointY
             }
           })
         }
@@ -223,6 +223,9 @@ class Level extends Phaser.Scene {
             if (progress > .9) {
               this.scene.stop('Level')
               this.scene.start('dead')
+            } else if (progress >= 1) {
+              gameState.player.x = gameState.spawnPointX
+              gameState.player.y = gameState.spawnPointY
             }
           })
         }
@@ -326,16 +329,16 @@ class Level extends Phaser.Scene {
     gameState.lantern = this.physics.add.sprite(gameState.width - 40 + 16, 9.9, 'lantern')//.setScale(1);
     this.physics.add.collider(gameState.lantern, gameState.platforms);
     this.physics.add.overlap(gameState.player, gameState.lantern, function () {
-      gameState.lightSpray()
-      this.cameras.main.fade(800, 255, 107, 233, false, function (camera, progress) {
+      //gameState.lightSpray()
+      /*this.cameras.main.fade(800, 255, 107, 233, false, function (camera, progress) {
         if (progress >= 1) {
           this.scene.stop('Level')
           this.scene.start('win')
           //this.scene.start(this.nextLevel[this.levelKey]);
         }
-      });
-      /*gameState.spawnPointX = 1950;
-      gameState.spawnPointY = 100;*/
+      });*/
+      gameState.spawnPointX = 1950;
+      gameState.spawnPointY = 100;
     }, null, this);
 
   }
@@ -375,6 +378,9 @@ class Level extends Phaser.Scene {
           if (progress > .9) {
             this.scene.stop('Level')
             this.scene.start('dead')
+          } else if (progress >= 1) {
+            gameState.player.x = gameState.spawnPointX
+            gameState.player.y = gameState.spawnPointY
           }
         });
       }
@@ -386,7 +392,8 @@ class Level extends Phaser.Scene {
 const gameState = {
   speed: 240
 };
-
+gameState.spawnPointX = 20;
+gameState.spawnPointY = 100;
 const config = {
   type: Phaser.WEBGL,
   width: 500,
