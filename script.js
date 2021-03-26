@@ -113,7 +113,6 @@ class Level extends Phaser.Scene {
     const map = this.make.tilemap({ key: 'map' });
     const tileset = map.addTilesetImage('16x16_Tile_pack_no_background', 'tiles');
     const ambient = map.createLayer('ambient', tileset).setPipeline('Light2D')
-    const ambient = map.createLayer('ambient', tileset).setPipeline('Light2D')
     this.lights.enable()//.setAmbientColor(0xffffff);
     gameState.active = true
     gameState.player = this.physics.add.sprite(gameState.spawnPointX, gameState.spawnPointY, 'codey').setScale(.5)//20, 100
@@ -393,8 +392,8 @@ class Level extends Phaser.Scene {
 const gameState = {
   speed: 240
 };
-gameState.spawnPointX = 250;
-gameState.spawnPointY = 300;
+gameState.spawnPointX = 20;
+gameState.spawnPointY = 100;
 const config = {
   type: Phaser.WEBGL,
   width: 500,
