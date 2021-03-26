@@ -245,6 +245,30 @@ class Level extends Phaser.Scene {
       yoyo: true
     });
     //theshadow  
+    //Relics
+    this.relics = this.physics.add.group({
+      allowGravity: false,
+      immovable: true,
+    });
+    const relicObjects = map.getObjectLayer('relics')['objects'];
+    relicObjects.forEach(relicject => {
+      const spike = this.relics.create(relicject.x, relicject.y - relicject.height, 'lantern').setOrigin(0, 0)
+      this.lights.addLight(relicject.x, relicject.y, 200, 0xff00e6, 6.3)
+    });
+    this.physics.add.overlap(gameState.player, this.relics, function (body1, body2) {
+      //gameState.lightSpray()
+      /*this.cameras.main.fade(800, 255, 107, 233, false, function (camera, progress) {
+        if (progress >= 1) {
+          this.scene.stop('Level')
+          this.scene.start('win')
+          //this.scene.start(this.nextLevel[this.levelKey]);
+        }
+      });*/
+      gameState.spawnPointX = body2.x;
+      gameState.spawnPointY = body2.y;
+    }, null, this);
+
+    //relics
   }
 
   createAnimations() {
@@ -325,7 +349,7 @@ class Level extends Phaser.Scene {
 
       })
     }
-    gameState.goal = this.lights.addLight(gameState.width - 40 + 10, 110, 200, 0xff00e6, 6.3)
+    /*gameState.goal = this.lights.addLight(gameState.width - 40 + 10, 110, 200, 0xff00e6, 6.3)
     gameState.lantern = this.physics.add.sprite(gameState.width - 40 + 16, 9.9, 'lantern')//.setScale(1);
     this.physics.add.collider(gameState.lantern, gameState.platforms);
     this.physics.add.overlap(gameState.player, gameState.lantern, function () {
@@ -337,9 +361,9 @@ class Level extends Phaser.Scene {
           //this.scene.start(this.nextLevel[this.levelKey]);
         }
       });*/
-      gameState.spawnPointX = 1950;
-      gameState.spawnPointY = 100;
-    }, null, this);
+    /*gameState.spawnPointX = 1950;
+    gameState.spawnPointY = 100;
+  }, null, this);*/
 
   }
 
@@ -393,7 +417,7 @@ const gameState = {
   speed: 240
 };
 gameState.spawnPointX = 20;
-gameState.spawnPointY = 100;
+gameState.spawnPointY = 200;
 const config = {
   type: Phaser.WEBGL,
   width: 500,
