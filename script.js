@@ -417,7 +417,7 @@ const gameState = {
   speed: 240
 };
 gameState.spawnPointX = 20;
-gameState.spawnPointY = 200;
+gameState.spawnPointY = 100;
 const config = {
   type: Phaser.WEBGL,
   width: 500,
