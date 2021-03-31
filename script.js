@@ -65,8 +65,8 @@ class dead extends Phaser.Scene {
     this.add.text(120, 300, 'Click to try again', { fontSize: '20px', fill: '#ff00fb' });
     this.input.on('pointerup', () => {
       this.scene.stop('dead')
-      this.sound.stopAll();
       this.scene.start('Level')
+
     });
   }
   update() {
