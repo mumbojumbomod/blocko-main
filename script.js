@@ -6,6 +6,8 @@ class preScene extends Phaser.Scene {
     this.load.spritesheet('codey', 'codey.png', { frameWidth: 72, frameHeight: 90 });
     this.load.image('Z', 'Z.png');
     this.load.image('circle', '33*33circle.png');
+    this.load.audio('music', ['composition.mp3', 'composition.ogg'])
+
   }//\n
   createAnimations() {
     this.anims.create({
@@ -31,6 +33,8 @@ class preScene extends Phaser.Scene {
       this.scene.start('Level')
       gameState.player.anims.play('run', false);
     });
+    gameState.music = this.sound.add('music');
+    gameState.music.play();
   }
   update() {
   }
@@ -93,7 +97,6 @@ class Level extends Phaser.Scene {
 
   preload() {
     this.load.audio('jump', 'noise/death.mp3');
-    this.load.image('platform', 'platform-1.png');
     this.load.spritesheet('campfire', 'campfire.png',
       { frameWidth: 32, frameHeight: 32 });
     this.load.spritesheet('codey', 'codey.png', { frameWidth: 72, frameHeight: 90 });
@@ -107,7 +110,7 @@ class Level extends Phaser.Scene {
     this.load.image('lightlessSoul', 'lightlessSoul.png');//light
     this.load.image('light', 'light.png');//light
     this.load.image('tiles', ['16x16_Tile_pack_no_background.png', 'NormalMap.png']);
-    // Load the export Tiled JSON
+    this.load.audio('music', ['composition.mp3', 'composition.ogg'])
     this.load.tilemapTiledJSON('map', 'shadow1.json');
   }
   create() {
@@ -137,7 +140,8 @@ class Level extends Phaser.Scene {
     this.cameras.main.startFollow(gameState.player, true, 0.5, 0.5)
     gameState.player.setCollideWorldBounds(true);
 
-
+    gameState.music = this.sound.add('music');
+    gameState.music.play();
     gameState.cursors = this.input.keyboard.createCursorKeys();
 
 
@@ -453,8 +457,8 @@ class Level extends Phaser.Scene {
 const gameState = {
   speed: 240
 };
-gameState.spawnPointX = 1500;
-gameState.spawnPointY = 1500;
+gameState.spawnPointX = 20;
+gameState.spawnPointY = 100;
 const config = {
   type: Phaser.WEBGL,
   width: 500,
