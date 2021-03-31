@@ -66,11 +66,14 @@ class win extends Phaser.Scene {
   preload() {
   }//\n
   create() {
-    this.add.text(20, 150, 'As you raise the relic, your soul\n combines with its power, the darkness\n dissolves away with its spikes.\n The souls who have been drained revert\n to their original state.\n The world is once again full of color.', { fontSize: '20px', fill: '#ff00fb' });
-    this.add.text(120, 300, 'Click to play again', { fontSize: '20px', fill: '#ff00fb' });
+    this.add.text(20, 150, 'As you raise the final relic, your soul\n combines with its power, the darkness\n dissolves away.\n The souls who have been drained revert\n to their original state.\n The world is once again full of color.', { fontSize: '20px', fill: '#ff00fb' });
+    this.add.text(20, 300, 'If you managed to get this far,\n than you are smart and resiliant!\n Good job!\n Take a screenshot, and you have full bragging\n rights!', { fontSize: '17px', fill: '#ff00fb' });
+    this.add.text(20, 400, 'Click to play again', { fontSize: '12px', fill: '#ff00fb' });
     this.input.on('pointerup', () => {
       this.scene.stop('win')
       this.scene.start('Level')
+      gameState.spawnPointX = 20
+      gameState.spawnPointY = 100
     });
   }
   update() {
@@ -270,6 +273,35 @@ class Level extends Phaser.Scene {
     }, null, this);
 
     //relics
+    //Relics2
+    this.relics2 = this.physics.add.group({
+      allowGravity: false,
+      immovable: true,
+    });
+    const relicObjects2 = map.getObjectLayer('relics2')['objects'];
+    relicObjects2.forEach(relicject2 => {
+      const spike2 = this.relics2.create(relicject2.x, relicject2.y - relicject2.height, 'lantern').setOrigin(0, 0)
+      this.lights.addLight(relicject2.x, relicject2.y, 200, 0xff00e6, 6.3)
+    });
+    this.physics.add.overlap(gameState.player, this.relics2, function (body1, body2) {
+      this.anims.pauseAll();
+      gameState.lightSpray()
+      let timer = this.time.addEvent({
+        delay: 500,
+        callback: () => {
+          this.physics.pause();
+          this.anims.resumeAll();
+          this.cameras.main.fade(800, 255, 107, 233, false, function (camera, progress) {
+            if (progress >= 1) {
+              this.scene.stop('Level')
+              this.scene.start('win')
+            }
+          });
+        }
+      })
+    }, null, this);
+
+    //relics2
     gameState.fpstext = this.add.text(20, 100, ``, { fontSize: '20px', fill: '#ff00fb' });
     gameState.fpstext.setScrollFactor(0)
   }
@@ -421,8 +453,8 @@ class Level extends Phaser.Scene {
 const gameState = {
   speed: 240
 };
-gameState.spawnPointX = 20;
-gameState.spawnPointY = 100;
+gameState.spawnPointX = 1500;
+gameState.spawnPointY = 1500;
 const config = {
   type: Phaser.WEBGL,
   width: 500,

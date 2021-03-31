@@ -49,18 +49,29 @@
                  "width":16,
                  "x":1583.24394864239,
                  "y":1042.16824528169
-                }, 
+                }],
+         "opacity":1,
+         "type":"objectgroup",
+         "visible":true,
+         "x":0,
+         "y":0
+        }, 
+        {
+         "draworder":"topdown",
+         "id":12,
+         "name":"relics2",
+         "objects":[
                 {
-                 "gid":716,
+                 "gid":715,
                  "height":16,
-                 "id":434,
+                 "id":467,
                  "name":"",
                  "rotation":0,
                  "type":"",
                  "visible":true,
                  "width":16,
-                 "x":1554.32492997199,
-                 "y":1393.85434173669
+                 "x":1554.30336371645,
+                 "y":1393.75769016414
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -1230,8 +1241,8 @@
          "x":0,
          "y":0
         }],
- "nextlayerid":12,
- "nextobjectid":467,
+ "nextlayerid":13,
+ "nextobjectid":468,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.4.3",
