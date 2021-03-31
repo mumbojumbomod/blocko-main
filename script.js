@@ -113,6 +113,7 @@ class Level extends Phaser.Scene {
     const map = this.make.tilemap({ key: 'map' });
     const tileset = map.addTilesetImage('16x16_Tile_pack_no_background', 'tiles');
     const ambient = map.createLayer('ambient', tileset).setPipeline('Light2D')
+
     this.lights.enable()//.setAmbientColor(0xffffff);
     gameState.active = true
     gameState.player = this.physics.add.sprite(gameState.spawnPointX, gameState.spawnPointY, 'codey').setScale(.5)//20, 100
@@ -206,8 +207,8 @@ class Level extends Phaser.Scene {
     });
     gameState.shadowobject = map.getObjectLayer('shadow')['objects'];
     gameState.shadowobject.forEach(shadowject => {
-      gameState.shadowconst = gameState.shadow.create(shadowject.x, shadowject.y - shadowject.height, 'lightlessSoul').setOrigin(0, 0).setPipeline('Light2D')
-      gameState.shadowconst.y -= 15;
+      let shadowconst = gameState.shadow.create(shadowject.x, shadowject.y - shadowject.height, 'lightlessSoul').setOrigin(0, 0).setPipeline('Light2D')
+      shadowconst.y -= 15;
     });
     this.physics.add.overlap(gameState.player, gameState.shadow, () => {
       gameState.player.body.destroy();
@@ -269,6 +270,8 @@ class Level extends Phaser.Scene {
     }, null, this);
 
     //relics
+    gameState.fpstext = this.add.text(20, 100, ``, { fontSize: '20px', fill: '#ff00fb' });
+    gameState.fpstext.setScrollFactor(0)
   }
 
   createAnimations() {
@@ -368,7 +371,9 @@ class Level extends Phaser.Scene {
   }
 
   update() {
-
+    gameState.fps = this.sys.game.loop.actualFps
+    gameState.fps = Math.floor(gameState.fps)
+    //gameState.fpstext.setText(gameState.fps)
     if (gameState.active) {
       if (gameState.cursors.right.isDown) {
         gameState.player.flipX = false;
@@ -438,3 +443,5 @@ const config = {
 };
 
 const game = new Phaser.Game(config);
+
+
