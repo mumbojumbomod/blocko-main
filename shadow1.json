@@ -3,7 +3,7 @@
     {
      "export":
         {
-         "target":"."
+         "target":"blocko-main"
         }
     },
  "height":125,
@@ -1263,7 +1263,7 @@
         {
          "columns":24,
          "firstgid":1,
-         "image":"..\/Endless shadows tile sets\/RunninBloods_HUGE_16x16_Asset_Pack\/Tiles\/16x16_Tile_pack_no_background.png",
+         "image":"Endless shadows tile sets\/RunninBloods_HUGE_16x16_Asset_Pack\/Tiles\/16x16_Tile_pack_no_background.png",
          "imageheight":544,
          "imagewidth":384,
          "margin":0,
