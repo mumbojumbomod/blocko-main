@@ -33,7 +33,16 @@ class preScene extends Phaser.Scene {
       this.scene.start('Level')
       gameState.player.anims.play('run', false);
     });
-    gameState.music = this.sound.add('music');
+    const musicConfig = {
+      mute: false,
+      volume: 1,
+      rate: 1,
+      detune: 0,
+      seek: 0,
+      loop: true,
+      delay: 0
+    }
+    gameState.music = this.sound.add('music', musicConfig);
     gameState.music.play();
   }
   update() {
@@ -110,7 +119,6 @@ class Level extends Phaser.Scene {
     this.load.image('lightlessSoul', 'lightlessSoul.png');//light
     this.load.image('light', 'light.png');//light
     this.load.image('tiles', ['16x16_Tile_pack_no_background.png', 'NormalMap.png']);
-    this.load.audio('music', ['composition.mp3', 'composition.ogg'])
     this.load.tilemapTiledJSON('map', 'shadow1.json');
   }
   create() {
@@ -139,9 +147,6 @@ class Level extends Phaser.Scene {
 
     this.cameras.main.startFollow(gameState.player, true, 0.5, 0.5)
     gameState.player.setCollideWorldBounds(true);
-
-    gameState.music = this.sound.add('music');
-    gameState.music.play();
     gameState.cursors = this.input.keyboard.createCursorKeys();
 
 
