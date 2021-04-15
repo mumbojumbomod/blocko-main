@@ -5,7 +5,11 @@ class Level extends Phaser.Scene {
   }
   preload() {
     this.load.spritesheet('robodude', 'playermove.png', { frameWidth: 117, frameHeight: 26 });
+    this.load.spritesheet('robodude2', 'playermove2.png', { frameWidth: 117, frameHeight: 26 });
+    this.load.spritesheet('charging', 'charge.png', { frameWidth: 117, frameHeight: 26 });
     this.load.spritesheet('robodudenodust', 'movenodust.png', { frameWidth: 117, frameHeight: 26 });
+    this.load.spritesheet('shooting', 'shooting.png', { frameWidth: 117, frameHeight: 26 });
+
     this.load.image('lantern', 'lantern.png');
   }
   create() {
@@ -14,8 +18,6 @@ class Level extends Phaser.Scene {
     gameState.player.body.setSize(gameState.player.width - 100, gameState.player.height - 3).setOffset(15, 3);
     gameState.player.setCollideWorldBounds()
     gameState.cursors = this.input.keyboard.createCursorKeys();
-    gameState.box = this.physics.add.sprite(50, 200, 'lantern').setScale(10)
-    this.physics.add.collider(gameState.box, gameState.player);
     gameState.active = true
 
   }
@@ -34,33 +36,58 @@ class Level extends Phaser.Scene {
     });
     this.anims.create({
       key: 'jump',
-      frames: this.anims.generateFrameNumbers('robodudenodust', { start: 0, end: 4 }),
+      frames: this.anims.generateFrameNumbers('robodudenodust', { start: 7, end: 7 }),
       frameRate: 3,
+      repeat: -1
+    });
+    this.anims.create({
+      key: 'runF',
+      frames: this.anims.generateFrameNumbers('robodude2', { start: 0, end: 7 }),
+      frameRate: 10,
+      repeat: -1
+    });
+    this.anims.create({
+      key: 'shoot',
+      frames: this.anims.generateFrameNumbers('shooting', { start: 0, end: 3 }),
+      frameRate: 10,
       repeat: -1
     });
   }
 
   update() {
-    gameState.box.setVelocityY(0)
     if (gameState.active) {
       if (gameState.cursors.right.isDown) {
-        gameState.player.flipX = false;
+        //gameState.player.flipX = false;
+        //gameState.player.setOffset(16, 0);
         gameState.player.setVelocityX(100);
         gameState.player.anims.play('run', true);
       } else if (gameState.cursors.left.isDown) {
-        gameState.player.flipX = true;
+        //gameState.player.flipX = true;
+        //gameState.player.setOffset(17 * 5, 0);
         gameState.player.setVelocityX(-100);
-        gameState.player.anims.play('run', true);
+        gameState.player.anims.play('runF', true);
+      } else if (gameState.cursors.space.isDown) {
+        gameState.player.anims.play('shoot', true);
+        gameState.player.setVelocityX(0);
+        /*
+                gameState.player.anims.play('charge', true);
+                let timer = this.time.addEvent({
+                  delay: 1000,
+                  callback: () => {
+                    gameState.player.anims.play('shoot', true);
+                    gameState.player.setVelocityX(0);
+                  }
+                })*/
       } else {
         gameState.player.setVelocityX(0);
         gameState.player.anims.play('not', true);
       }
       if (Phaser.Input.Keyboard.JustDown(gameState.cursors.up) && gameState.player.body.onFloor()) {
-        //gameState.player.anims.play('jump', true);
+        gameState.player.anims.play('jump', true);
         gameState.player.setVelocityY(-500);
       }
       if (!gameState.player.body.onFloor()) {
-        //gameState.player.anims.play('jump', true);
+        gameState.player.anims.play('jump', true);
       }
     }
   }
