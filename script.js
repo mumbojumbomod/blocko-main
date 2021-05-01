@@ -5,19 +5,52 @@ class Level extends Phaser.Scene {
   }
   preload() {
     this.load.spritesheet('robodude', 'playermove.png', { frameWidth: 117, frameHeight: 26 });
+    this.load.spritesheet('spites', 'spites.png', { frameWidth: 8, frameHeight: 16 });
+    this.load.spritesheet('spitesD', 'spitesD.png', { frameWidth: 8, frameHeight: 16 });
     this.load.spritesheet('robodude2', 'playermove2.png', { frameWidth: 117, frameHeight: 26 });
     this.load.spritesheet('robodudenodust', 'movenodust.png', { frameWidth: 117, frameHeight: 26 });
     this.load.spritesheet('robodudenodust2', 'movenodust2.png', { frameWidth: 117, frameHeight: 26 });
     this.load.spritesheet('shooting', 'shooting.png', { frameWidth: 117, frameHeight: 26 });
     this.load.spritesheet('shooting2', 'shooting2.png', { frameWidth: 117, frameHeight: 26 });
+    this.load.spritesheet('wake', 'wake.png', { frameWidth: 117, frameHeight: 26 });
     this.load.image('bullet', 'bullet.png');
+    this.load.image('tiles', ['derelict_spacecraft_tiles.png', 'NormalMap.png']);
+    this.load.image('bg1', 'parallax/parallax1.png');
+    this.load.image('bg2', 'parallax/parallax2.png');
+    this.load.image('bg3', 'parallax/parallax3.png');
+    this.load.image('bg4', 'parallax/parallax4.png');
+    this.load.image('bg5', 'parallax/parallax5.png');
+
+    this.load.image('H0', 'H/H0.png');
+    this.load.image('H1', 'H/H1.png');
+    this.load.image('H2', 'H/H2.png');
+    this.load.image('H3', 'H/H3.png');
+    this.load.image('H4', 'H/H4.png');
+    this.load.image('HF', 'H/HF.png');
+    this.load.image('numH', 'H/num.png');
+    this.load.image('saberdude', 'saber/saberdude.png');
+    this.load.spritesheet('idle', 'saber/idle.png', { frameWidth: 121, frameHeight: 70 });
+    this.load.spritesheet('quickspin', 'saber/quick spin attack.png', { frameWidth: 121, frameHeight: 70 });
+    this.load.spritesheet('wlak', 'saber/move.png', { frameWidth: 40, frameHeight: 70 });
+    this.load.tilemapTiledJSON('map', 'untitled.json');
   }
   create() {
+    //alert("dead!!");
+    this.createParallaxBackgrounds()
+    this.lights.enable()//.setAmbientColor(0xffffff);
     gameState.this = this
     gameState.lastFired = 0;
     let bullets;
     this.createAnimations()
-    gameState.player = this.physics.add.sprite(100, 100, 'robodude')
+    const map = this.make.tilemap({ key: 'map' });
+    const tileset = map.addTilesetImage('derelict_spacecraft_tiles', 'tiles');
+    const backgrounds = map.createLayer('backgrounds', tileset).setPipeline('Light2D')
+    gameState.platforms = map.createLayer('platforms', tileset, 0, 0).setPipeline('Light2D')//.setScale(0.9);
+    gameState.platforms.setCollisionByExclusion(-1, true);
+    gameState.player = this.physics.add.sprite(0, 0, 'robodude').setPipeline('Light2D')
+    //gameState.playerLight = this.lights.addLight(200, 0, 100, 0xffff00, 3.3)
+    this.physics.add.collider(gameState.player, gameState.platforms);
+
     var Bullet = new Phaser.Class({
       Extends: Phaser.GameObjects.Image,
       initialize:
@@ -43,6 +76,7 @@ class Level extends Phaser.Scene {
         })
       }
     });
+
     gameState.bullets = this.add.group({
       classType: Bullet,
       maxSize: 10,
@@ -84,8 +118,152 @@ class Level extends Phaser.Scene {
     gameState.cursors = this.input.keyboard.createCursorKeys();
     gameState.active = true
     gameState.flip = false
+    this.cameras.main.startFollow(gameState.player, true, 0.5, 0.5)
+    this.cameras.main.setBounds(0, 0, 3000, 1000);
+    this.physics.world.setBounds(0, 0, 3000, 1100);
+    gameState.spites = this.physics.add.group({
+      allowGravity: false,
+      immovable: true,
+    });
+    const spitesObjects = map.getObjectLayer('spites')['objects'];
+    spitesObjects.forEach(spitesObject => {
+      const spite = gameState.spites.create(spitesObject.x, spitesObject.y - spitesObject.height, 'spites').setOrigin(0, 0).setPipeline('Light2D');
+    });
+    spitesObjects.forEach(ject => {
+      this.lights.addLight(ject.x, ject.y, 100, 0xffff00, 2.3)
+    })
+    gameState.HP = this.add.sprite(470, 20, 'HF').setScrollFactor(0)
+    gameState.HPnum = this.add.sprite(420, 20, 'numH').setScrollFactor(0)
+    gameState.HPint = 1000
+    this.physics.add.overlap(gameState.player, gameState.spites, () => {
+      gameState.HPint--
+    });
+    gameState.spitesD = this.physics.add.group({
+      allowGravity: false,
+      immovable: true,
+    });
+    const spitesObjectsD = map.getObjectLayer('spitesD')['objects'];
+    spitesObjectsD.forEach(spitesObjectD => {
+      const spite = gameState.spitesD.create(spitesObjectD.x, spitesObjectD.y - spitesObjectD.height, 'spitesD').setOrigin(0, 0).setPipeline('Light2D');
+    });
+    spitesObjectsD.forEach(ject => {
+      this.lights.addLight(ject.x, ject.y, 100, 0xffff00, 2.3)
+    })
+    this.physics.add.overlap(gameState.player, gameState.spitesD, () => {
+      gameState.HPint--
+    });
+    const frontA = map.createLayer('frontA', tileset).setPipeline('Light2D')
+    gameState.HPtext = this.add.text(411, 18, '1000', { fontSize: '8px', fill: '#00a808' }).setScrollFactor(0);
+    ///enemies
+    gameState.saber = this.physics.add.group({
+      allowGravity: false,
+      immovable: true,
+    });
+    gameState.saberObjects = map.getObjectLayer('saber3')['objects'];
+    gameState.saberObjects.forEach(saberObject => {
+      const saber = gameState.saber.create(saberObject.x, saberObject.y - saberObject.height, 'appear').setOrigin(0, 0).setPipeline('Light2D')
+      saber.body.setSize(saber.width + 50, saber.height).setOffset(-20, 30);
+      saber.y -= 60
+      saber.x -= 50
+    });
+    gameState.tribot = [];//array of enemies
+    gameState.saber.children.iterate(function (child) {
+      gameState.tribot.push(child)
+    });
+    gameState.moveTween = this.tweens.add({
+      targets: gameState.tribot,
+      x: '+=100',
+      ease: 'Linear',
+      flipX: true,
+      duration: 1666,
+      repeat: -1,
+      yoyo: true
+    });
+    gameState.saber.children.iterate(function (sab) {
+      sab.anims.play('wlak', true)
+      sab.state = 'walking'
+    })
+    gameState.saber.children.iterate(function (sab) {
+      gameState.this.physics.add.overlap(gameState.player, gameState.saber, () => {
+        gameState.HPint--
+        sab.anims.play('quickspin', true)
+      });
+    })
+    //console.log('I\'ve reached here')
+
+    //enemies
+
+    /*let triggerObject = this.physics.add.sprite(100, 60, 'H0');
+    triggerObject.fired = false;
+    triggerObject.body.setAllowGravity(false);
+    this.physics.add.overlap(gameState.player, triggerObject, (object1, object2) => {
+      !triggerObject.fired ? this.physics.add.sprite(object1.x + 100, object1.y, 'appear') : null;
+      triggerObject.fired = true;
+    });*/
+
+
   }
+
+  createParallaxBackgrounds() {
+    gameState.bg1 = this.add.image(0, 0, 'bg1').setScale(5);
+    gameState.bg2 = this.add.image(0, 0, 'bg2').setScale(5);
+    gameState.bg4 = this.add.image(0, 0, 'bg4').setScale(5);
+    gameState.bg3 = this.add.image(0, 0, 'bg3').setScale(5);
+    gameState.bg5 = this.add.image(0, 0, 'bg5').setScale(5);
+
+    gameState.bg1.setOrigin(0, 0);
+    gameState.bg2.setOrigin(0, 0);
+    gameState.bg3.setOrigin(0, 0);
+    gameState.bg4.setOrigin(0, 0);
+    gameState.bg5.setOrigin(0, 0);
+
+    const game_width = 3000//parseFloat(gameState.bg3.getBounds().width)
+    gameState.width = game_width;
+    const window_width = config.width
+
+    const bg1_width = gameState.bg1.getBounds().width
+    const bg2_width = gameState.bg2.getBounds().width
+    const bg3_width = gameState.bg3.getBounds().width
+    const bg4_width = gameState.bg4.getBounds().width
+    const bg5_width = gameState.bg5.getBounds().width
+    gameState.bg4.setScrollFactor((bg4_width - window_width) / (game_width - window_width));
+    gameState.bg5.setScrollFactor((bg5_width - window_width) / (game_width - window_width));
+    gameState.bg2.setScrollFactor((bg2_width - window_width) / (game_width - window_width));
+    gameState.bg3.setScrollFactor((bg3_width - window_width) / (game_width - window_width));
+    gameState.bg1.setScrollFactor((bg1_width - window_width) / (game_width - window_width));
+  }
+
   createAnimations() {
+    this.anims.create({
+      key: 'quickspin',
+      frames: this.anims.generateFrameNumbers('quickspin', { start: 0, end: 4 }),
+      frameRate: 10,
+      repeat: -1
+    });
+    this.anims.create({
+      key: 'idle',
+      frames: this.anims.generateFrameNumbers('idle', { start: 0, end: 5 }),
+      frameRate: 10,
+      repeat: -1
+    });
+    this.anims.create({
+      key: 'wlak',
+      frames: this.anims.generateFrameNumbers('wlak', { start: 0, end: 5 }),
+      frameRate: 10,
+      repeat: -1
+    });
+    this.anims.create({
+      key: 'spitesAnim',
+      frames: this.anims.generateFrameNumbers('spites', { start: 0, end: 9 }),
+      frameRate: 10,
+      repeat: -1
+    });
+    this.anims.create({
+      key: 'spitesAnimD',
+      frames: this.anims.generateFrameNumbers('spitesD', { start: 0, end: 9 }),
+      frameRate: 10,
+      repeat: -1
+    });
     this.anims.create({
       key: 'run',
       frames: this.anims.generateFrameNumbers('robodude', { start: 0, end: 7 }),
@@ -134,9 +312,46 @@ class Level extends Phaser.Scene {
       frameRate: 10,
       repeat: -1
     });
+    this.anims.create({
+      key: 'wake',
+      frames: this.anims.generateFrameNumbers('wake', { start: 0, end: 4 }),
+      frameRate: 4,
+      repeat: -1
+    });
   }
 
   update(time, delta) {
+    gameState.HPtext.setText(gameState.HPint)
+    if (gameState.HPint < 1000) {
+      gameState.HPtext.x = 413
+    }
+    if (gameState.HPint < 100) {
+      gameState.HPtext.x = 415.5
+    }
+    if (gameState.HPint < 10) {
+      gameState.HPtext.x = 418
+    }
+    if (gameState.HPint === 800) {
+      gameState.HP = this.add.sprite(470, 20, 'H4').setScrollFactor(0)
+    }
+    if (gameState.HPint === 600) {
+      gameState.HP = this.add.sprite(470, 20, 'H3').setScrollFactor(0)
+    }
+    if (gameState.HPint === 400) {
+      gameState.HP = this.add.sprite(470, 20, 'H2').setScrollFactor(0)
+    }
+    if (gameState.HPint === 200) {
+      gameState.HP = this.add.sprite(470, 20, 'H1').setScrollFactor(0)
+    }
+    if (gameState.HPint === 0) {
+      gameState.HP = this.add.sprite(470, 20, 'H0').setScrollFactor(0)
+    }
+    gameState.spites.children.iterate(function (child) {
+      child.anims.play('spitesAnim', true);
+    });
+    gameState.spitesD.children.iterate(function (child) {
+      child.anims.play('spitesAnimD', true);
+    });
     if (gameState.active) {
       if (gameState.cursors.right.isDown) {
         //gameState.player.flipX = false;
@@ -155,17 +370,21 @@ class Level extends Phaser.Scene {
           gameState.player.anims.play('shootF', true);
           gameState.player.setVelocityX(0);
           var bulletF = gameState.bulletsF.get();
+          bulletF.setPipeline('Light2D')
           if (bulletF) {
             bulletF.fireF(gameState.player.x, gameState.player.y);
             gameState.lastFired = time + 500;
+
           }
         } else if (gameState.flip === false && time > gameState.lastFired) {
           gameState.player.anims.play('shoot', true);
           gameState.player.setVelocityX(0);
           var bullet = gameState.bullets.get();
+          bullet.setPipeline('Light2D')
           if (bullet) {
             bullet.fire(gameState.player.x, gameState.player.y);
             gameState.lastFired = time + 500;
+            this.physics.add.collider(bullet, gameState.platforms);
           }
         }
       } else {
