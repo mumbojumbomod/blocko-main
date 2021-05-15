@@ -1,0 +1,16 @@
+{
+	"folders": [
+		{
+			"name": "PARSE",
+			"path": ".."
+		},
+		{
+			"name": "Scifi Pack 12",
+			"path": "../../../../Scifi Pack 12"
+		}
+	],
+	"settings": {
+		"liveServer.settings.multiRootWorkspaceName": "PARSE",
+		"liveServer.settings.port": 5501
+	}
+}

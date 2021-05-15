@@ -20,7 +20,7 @@ class Level extends Phaser.Scene {
     this.load.image('bg3', 'parallax/parallax3.png');
     this.load.image('bg4', 'parallax/parallax4.png');
     this.load.image('bg5', 'parallax/parallax5.png');
-
+    this.load.image('door', 'doordoo.png');
     this.load.image('H0', 'H/H0.png');
     this.load.image('H1', 'H/H1.png');
     this.load.image('H2', 'H/H2.png');
@@ -30,12 +30,14 @@ class Level extends Phaser.Scene {
     this.load.image('numH', 'H/num.png');
     this.load.image('saberdude', 'saber/saberdude.png');
     this.load.spritesheet('idle', 'saber/idle.png', { frameWidth: 121, frameHeight: 70 });
+    this.load.spritesheet('dooranim', 'dooropening.png', { frameWidth: 48, frameHeight: 64 });
     this.load.spritesheet('quickspin', 'saber/quick spin attack.png', { frameWidth: 121, frameHeight: 70 });
     this.load.spritesheet('wlak', 'saber/move.png', { frameWidth: 40, frameHeight: 70 });
     this.load.tilemapTiledJSON('map', 'untitled.json');
   }
   create() {
     //alert("dead!!");
+
     this.createParallaxBackgrounds()
     this.lights.enable()//.setAmbientColor(0xffffff);
     gameState.this = this
@@ -48,6 +50,7 @@ class Level extends Phaser.Scene {
     gameState.platforms = map.createLayer('platforms', tileset, 0, 0).setPipeline('Light2D')//.setScale(0.9);
     gameState.platforms.setCollisionByExclusion(-1, true);
     gameState.player = this.physics.add.sprite(0, 0, 'robodude').setPipeline('Light2D')
+    gameState.player.depth = 100
     //gameState.playerLight = this.lights.addLight(200, 0, 100, 0xffff00, 3.3)
     this.physics.add.collider(gameState.player, gameState.platforms);
 
@@ -181,27 +184,38 @@ class Level extends Phaser.Scene {
     });
     gameState.saber.children.iterate(function (sab) {
       sab.anims.play('wlak', true)
-      sab.state = 'walking'
-    })
-    gameState.saber.children.iterate(function (sab) {
       gameState.this.physics.add.overlap(gameState.player, gameState.saber, () => {
         gameState.HPint--
-        sab.anims.play('quickspin', true)
       });
     })
-    //console.log('I\'ve reached here')
+    gameState.hunkyDOORy = this.physics.add.group({
+      allowGravity: false,
+      immovable: true,
+    });
+    gameState.doorObjects = map.getObjectLayer('doors')['objects'];
+    gameState.doorObjects.forEach(doorObject => {
+      const door = gameState.hunkyDOORy.create(doorObject.x, doorObject.y - doorObject.height, 'door').setOrigin(0, 0).setPipeline('Light2D')
+      door.y -= 55
+      gameState.this.physics.add.overlap(gameState.player, gameState.hunkyDOORy, () => {
+        if (gameState.cursors.shift.isDown) {
+          gameState.hunkyDOORy.children.iterate(function (bub) {
+            bub.anims.play('dooranim', true)
+            let timer = gameState.this.time.addEvent({
+              delay: 350,
+              callback: () => {
+                bub.anims.play('dooranim', false)
+                gameState.this.cameras.main.fade(800, 0, 0, 0, false, function (camera, progress) {
+                  if (progress > .9) {
+                    console.log('makeDaScene den ChangeDaScene')
+                  }
+                });
+              }
+            })
+          })
+        }
+      });
 
-    //enemies
-
-    /*let triggerObject = this.physics.add.sprite(100, 60, 'H0');
-    triggerObject.fired = false;
-    triggerObject.body.setAllowGravity(false);
-    this.physics.add.overlap(gameState.player, triggerObject, (object1, object2) => {
-      !triggerObject.fired ? this.physics.add.sprite(object1.x + 100, object1.y, 'appear') : null;
-      triggerObject.fired = true;
-    });*/
-
-
+    })
   }
 
   createParallaxBackgrounds() {
@@ -234,6 +248,13 @@ class Level extends Phaser.Scene {
   }
 
   createAnimations() {
+    this.anims.create({
+      key: 'dooranim',
+      frames: this.anims.generateFrameNumbers('dooranim', { start: 0, end: 14 }),
+      frameRate: 10,
+      repeat: -1
+    });
+
     this.anims.create({
       key: 'quickspin',
       frames: this.anims.generateFrameNumbers('quickspin', { start: 0, end: 4 }),
@@ -321,6 +342,8 @@ class Level extends Phaser.Scene {
   }
 
   update(time, delta) {
+
+
     gameState.HPtext.setText(gameState.HPint)
     if (gameState.HPint < 1000) {
       gameState.HPtext.x = 413
