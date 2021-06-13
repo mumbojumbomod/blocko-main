@@ -1,3 +1,4 @@
+//import Bigdoor from './Bigdoor.js'
 class Level extends Phaser.Scene {
 
   constructor(key) {
@@ -163,15 +164,12 @@ class Level extends Phaser.Scene {
       immovable: true,
     });
     gameState.saberObjects = map.getObjectLayer('saber3')['objects'];
-    gameState.saberObjects.forEach(saberObject => {
-      const saber = gameState.saber.create(saberObject.x, saberObject.y - saberObject.height, 'appear').setOrigin(0, 0).setPipeline('Light2D')
+    gameState.tribot = gameState.saberObjects.map(saberObject => {
+      let saber = gameState.saber.create(saberObject.x, saberObject.y - saberObject.height, 'appear').setOrigin(0, 0).setPipeline('Light2D')
       saber.body.setSize(saber.width + 50, saber.height).setOffset(-20, 30);
       saber.y -= 60
       saber.x -= 50
-    });
-    gameState.tribot = [];//array of enemies
-    gameState.saber.children.iterate(function (child) {
-      gameState.tribot.push(child)
+      return saber
     });
     gameState.moveTween = this.tweens.add({
       targets: gameState.tribot,
@@ -184,38 +182,15 @@ class Level extends Phaser.Scene {
     });
     gameState.saber.children.iterate(function (sab) {
       sab.anims.play('wlak', true)
-      gameState.this.physics.add.overlap(gameState.player, gameState.saber, () => {
-        gameState.HPint--
+      gameState.this.physics.add.overlap(gameState.player, sab, () => {
+        sab.anims.play('wlak', false)
+        sab.anims.play('quickspin', true)
       });
     })
-    gameState.hunkyDOORy = this.physics.add.group({
-      allowGravity: false,
-      immovable: true,
-    });
-    gameState.doorObjects = map.getObjectLayer('doors')['objects'];
-    gameState.doorObjects.forEach(doorObject => {
-      const door = gameState.hunkyDOORy.create(doorObject.x, doorObject.y - doorObject.height, 'door').setOrigin(0, 0).setPipeline('Light2D')
-      door.y -= 55
-      gameState.this.physics.add.overlap(gameState.player, gameState.hunkyDOORy, () => {
-        if (gameState.cursors.shift.isDown) {
-          gameState.hunkyDOORy.children.iterate(function (bub) {
-            bub.anims.play('dooranim', true)
-            let timer = gameState.this.time.addEvent({
-              delay: 350,
-              callback: () => {
-                bub.anims.play('dooranim', false)
-                gameState.this.cameras.main.fade(800, 0, 0, 0, false, function (camera, progress) {
-                  if (progress > .9) {
-                    console.log('makeDaScene den ChangeDaScene')
-                  }
-                });
-              }
-            })
-          })
-        }
-      });
+    const doors = this.physics.add.group({
 
     })
+    //doors.get(200, 200, '../Bigdoor.door')
   }
 
   createParallaxBackgrounds() {

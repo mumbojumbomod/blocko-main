@@ -1,4 +1,11 @@
 { "compressionlevel":-1,
+ "editorsettings":
+    {
+     "export":
+        {
+         "target":"..\/..\/..\/"
+        }
+    },
  "height":200,
  "infinite":false,
  "layers":[
@@ -344,7 +351,7 @@
         {
          "columns":4,
          "firstgid":1,
-         "image":"..\/..\/..\/Pixel Art Tileset Collection\/derelict_spacecraft\/derelict_spacecraft_tiles.png",
+         "image":"..\/..\/..\/derelict_spacecraft_tiles.png",
          "imageheight":505,
          "imagewidth":37,
          "margin":1,
