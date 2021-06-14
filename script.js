@@ -120,7 +120,7 @@ class Level extends Phaser.Scene {
       maxSize: 10,
       runChildUpdate: true
     });
-    this.physics.add.collider(gameState.bulletsF, gameState.platforms, () => { console.log('clang!') });
+    this.physics.add.collider(gameState.bulletsF, gameState.platforms, () => { console.log('Clang!!') });
     gameState.player.body.setSize(gameState.player.width - 100, gameState.player.height - 3).setOffset(15, 3);
     gameState.player.setCollideWorldBounds()
     gameState.cursors = this.input.keyboard.createCursorKeys();
@@ -192,10 +192,18 @@ class Level extends Phaser.Scene {
         sab.anims.play('wlak', false)
         moveTween.stop()
         sab.setTint(0xffffff);
-        sab.body.setSize(32 + 80, 32).setOffset(+15, 34);
+        sab.body.setSize(32 + 70, 32).setOffset(+15, 34);
         sab.x -= 50;
+        let lite = gameState.this.lights.addLight(sab.x + 50, sab.y, 100, 0xff0019, 2)
         sab.anims.play('quickspin', true)
         console.log('is called?')
+        let timer2 = gameState.this.time.addEvent({
+          delay: 100,
+          callback: () => {
+            //lite.setActive(false);
+            lite.setVisible(false);
+          }
+        })
       });
       gameState.this.physics.add.overlap(gameState.player, sab, () => {
         sab.emit('attack')
@@ -449,7 +457,7 @@ const config = {
     arcade: {
       gravity: { y: 800 },
       enableBody: true,
-      debug: true,
+      debug: false,
 
     }
   },
