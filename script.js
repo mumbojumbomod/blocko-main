@@ -457,7 +457,7 @@ const config = {
     arcade: {
       gravity: { y: 800 },
       enableBody: true,
-      debug: false,
+      debug: true,
 
     }
   },
