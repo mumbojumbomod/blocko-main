@@ -81,11 +81,13 @@ class Level extends Phaser.Scene {
       }
     });
 
-    gameState.bullets = this.add.group({
+    gameState.bullets = this.physics.add.group({
+      allowGravity: false,
       classType: Bullet,
       maxSize: 10,
       runChildUpdate: true
     });
+    this.physics.add.collider(gameState.bullets, gameState.platforms, () => { console.log('clang!') });
     let bulletsF;
     var BulletF = new Phaser.Class({
       Extends: Phaser.GameObjects.Image,
@@ -112,11 +114,13 @@ class Level extends Phaser.Scene {
         })
       }
     });
-    gameState.bulletsF = this.add.group({
+    gameState.bulletsF = this.physics.add.group({
+      allowGravity: false,
       classType: BulletF,
       maxSize: 10,
       runChildUpdate: true
     });
+    this.physics.add.collider(gameState.bulletsF, gameState.platforms, () => { console.log('clang!') });
     gameState.player.body.setSize(gameState.player.width - 100, gameState.player.height - 3).setOffset(15, 3);
     gameState.player.setCollideWorldBounds()
     gameState.cursors = this.input.keyboard.createCursorKeys();
@@ -160,31 +164,42 @@ class Level extends Phaser.Scene {
     gameState.HPtext = this.add.text(411, 18, '1000', { fontSize: '8px', fill: '#00a808' }).setScrollFactor(0);
     ///enemies
     gameState.saber = this.physics.add.group({
-      allowGravity: false,
+      allowGravity: true,
       immovable: true,
     });
+    this.physics.add.collider(gameState.saber, gameState.platforms);
     gameState.saberObjects = map.getObjectLayer('saber3')['objects'];
     gameState.tribot = gameState.saberObjects.map(saberObject => {
       let saber = gameState.saber.create(saberObject.x, saberObject.y - saberObject.height, 'appear').setOrigin(0, 0).setPipeline('Light2D')
-      saber.body.setSize(saber.width + 50, saber.height).setOffset(-20, 30);
-      saber.y -= 60
+      saber.body.setSize(saber.width + 50, saber.height).setOffset(-20, 34);
+      saber.y -= 50
       saber.x -= 50
       return saber
     });
-    gameState.moveTween = this.tweens.add({
-      targets: gameState.tribot,
-      x: '+=100',
-      ease: 'Linear',
-      flipX: true,
-      duration: 1666,
-      repeat: -1,
-      yoyo: true
-    });
+
     gameState.saber.children.iterate(function (sab) {
       sab.anims.play('wlak', true)
-      gameState.this.physics.add.overlap(gameState.player, sab, () => {
+      const moveTween = gameState.this.tweens.add({
+        targets: sab,
+        x: '+=100',
+        ease: 'Linear',
+        flipX: true,
+        duration: 1666,
+        repeat: -1,
+        yoyo: true,
+      });
+      sab.once('attack', () => {
         sab.anims.play('wlak', false)
+        moveTween.stop()
+        sab.setTint(0xffffff);
+        sab.body.setSize(32 + 80, 32).setOffset(+15, 34);
+        sab.x -= 50;
         sab.anims.play('quickspin', true)
+        console.log('is called?')
+      });
+      gameState.this.physics.add.overlap(gameState.player, sab, () => {
+        sab.emit('attack')
+        gameState.HPint--
       });
     })
     const doors = this.physics.add.group({
@@ -317,8 +332,16 @@ class Level extends Phaser.Scene {
   }
 
   update(time, delta) {
-
-
+    gameState.saber.children.iterate(function (sab) {
+      let enimGoal = gameState.player.x - 100;
+      if (enimGoal > sab.x) {
+        sab.setVelocityX(+80)
+      } else if (enimGoal < sab.x) {
+        sab.setVelocityX(-80)
+      } else if (enimGoal = sab.x) {
+        sab.setVelocityX(0)
+      }
+    })
     gameState.HPtext.setText(gameState.HPint)
     if (gameState.HPint < 1000) {
       gameState.HPtext.x = 413
@@ -382,7 +405,6 @@ class Level extends Phaser.Scene {
           if (bullet) {
             bullet.fire(gameState.player.x, gameState.player.y);
             gameState.lastFired = time + 500;
-            this.physics.add.collider(bullet, gameState.platforms);
           }
         }
       } else {
